@@ -1,0 +1,48 @@
+#!/usr/bin/env php
+<?php declare(strict_types=1);
+
+function varexport($expression, $return=FALSE) {
+    $export = var_export($expression, TRUE);
+    $export = preg_replace("/^([ ]*)(.*)/m", '$1$1$2', $export);
+    $array = preg_split("/\r\n|\n|\r/", $export);
+    $array = preg_replace(["/\s*array\s\($/", "/\)(,)?$/", "/\s=>\s$/"], [NULL, ']$1', ' => ['], $array);
+    $export = join(PHP_EOL, array_filter(["["] + $array));
+    if ((bool)$return) return $export; else echo $export;
+}
+
+$input = stream_get_contents(STDIN);
+
+if(!trim($input)){
+	fwrite(STDERR, 'No input specified. Please provide a json.');
+    die(1);
+}
+try{
+	$inputObject = json_decode($input, true);
+    $output = varexport($inputObject, true);
+    fwrite(STDOUT, $output);
+}catch(\Exception $e){
+	fwrite(STDERR, $e->getMessage());
+}
+if(($err = json_last_error()) !== JSON_ERROR_NONE){
+    switch ($err) {
+        case JSON_ERROR_DEPTH:
+            fwrite(STDERR, $input. ' - Maximum stack depth exceeded');
+        break;
+        case JSON_ERROR_STATE_MISMATCH:
+            fwrite(STDERR, $input. ' - Underflow or the modes mismatch');
+        break;
+        case JSON_ERROR_CTRL_CHAR:
+            fwrite(STDERR, $input. ' - Unexpected control character found');
+        break;
+        case JSON_ERROR_SYNTAX:
+            fwrite(STDERR, $input. ' - Syntax error, malformed JSON');
+        break;
+        case JSON_ERROR_UTF8:
+            fwrite(STDERR, $input. ' - Malformed UTF-8 characters, possibly incorrectly encoded');
+        break;
+        default:
+            fwrite(STDERR, $input. ' - Unknown error');
+        break;
+    }
+    die($err);
+}

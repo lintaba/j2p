@@ -1,0 +1,8 @@
+{
+    "name": "lintaba/j2p",
+    "description": "json to php",
+    "require": {},
+    "bin": [
+    	"j2p"
+    ]
+}
