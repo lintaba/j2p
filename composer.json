@@ -2,6 +2,7 @@
     "name": "lintaba/j2p",
     "description": "json to php",
     "require": {},
+    "version":"0.1.0",
     "bin": [
     	"j2p"
     ]

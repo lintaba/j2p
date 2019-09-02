@@ -27,6 +27,6 @@ echo '{"foo":42}' | j2p
 Output: 
 ```php
 [
-    "foo" => 42,
+    'foo' => 42,
 ]
 ```
